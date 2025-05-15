@@ -18,6 +18,7 @@
       let
         pkgs = import nixpkgs {
           inherit system;
+          confif.allowUnfree = true;
         };
         pkgsLinux = import nixpkgs {
           system = "x86_64-linux";
@@ -35,6 +36,15 @@
           name = "github-runner";
           tag = "latest";
           fromImage = nixFromDockerHub;
+
+          copyToRoot = pkgs.buildEnv {
+            name = "image-root";
+            pathsToLink = [ "/bin" ];
+            paths = with pkgsLinux; [
+              github-runner
+              docker
+            ];
+          };
         };
 
       in
