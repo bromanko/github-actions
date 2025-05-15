@@ -18,62 +18,28 @@
       let
         pkgs = import nixpkgs {
           inherit system;
+        };
+        pkgsLinux = import nixpkgs {
+          system = "x86_64-linux";
           config.allowUnfree = true;
         };
+        nixFromDockerHub = pkgs.dockerTools.pullImage {
+          imageName = "nixos/nix";
+          imageDigest = "sha256:e623d73af9cac82d1b50784c83e0cf2a4b83bfd2cfe8d5b67809a2fc94e043ac";
+          hash = "sha256-Zw6jwUzRyi9/T50otrSf4MwRASAU38bEYcERQMbflbg=";
+          finalImageTag = "2.28.3";
+          finalImageName = "nix";
+        };
+
+        runnerImage = pkgs.dockerTools.buildImage {
+          name = "github-runner";
+          tag = "latest";
+          fromImage = nixFromDockerHub;
+        };
+
       in
       {
-        packages = rec {
-          runnerImage = pkgs.dockerTools.buildLayeredImage {
-            name = "github-runner";
-            tag = "latest";
-            # Base image comes from NixOS
-            fromImage = "docker.io/library/nixos/nix";
-
-            # Entrypoint: start systemd, then runner service
-            config = {
-              Cmd = [ "/usr/sbin/init" ];
-            };
-
-            # Additional commands to install and enable the runner
-            extraCommands =
-              let
-                runnerVersion = "2.330.0";
-              in
-              ''
-                mkdir -p /opt/actions-runner
-                cd /opt/actions-runner
-
-                # Download and extract the GitHub Actions runner
-                curl -SL https://github.com/actions/runner/releases/download/v${runnerVersion}/actions-runner-linux-x64-${runnerVersion}.tar.gz \
-                  | tar xz
-
-                # Example config: set URL and TOKEN when running the container
-                # ENTRYPOINT or docker run should pass:
-                #   -e RUNNER_URL=<repo or org URL>
-                #   -e RUNNER_TOKEN=<registration token>
-                # Then the runner will register itself in an entrypoint script.
-
-                # Service unit for the runner
-                cat > /etc/systemd/system/github-runner.service <<EOF
-                [Unit]
-                Description=GitHub Actions Runner
-                After=network.target
-
-                [Service]
-                Type=simple
-                User=root
-                WorkingDirectory=/opt/actions-runner
-                ExecStart=/opt/actions-runner/run.sh --once --url $${RUNNER_URL} --token $${RUNNER_TOKEN}
-                Restart=always
-
-                [Install]
-                WantedBy=multi-user.target
-                EOF
-
-                # Enable the service
-                ln -s /etc/systemd/system/github-runner.service /etc/systemd/system/multi-user.target.wants/
-              '';
-          };
+        packages = {
           default = runnerImage;
         };
 
@@ -84,7 +50,7 @@
             "docker"
             "load"
             "<"
-            (builtins.toString self.packages.${system}.runnerImage)
+            (builtins.toString runnerImage)
           ];
         };
       }
