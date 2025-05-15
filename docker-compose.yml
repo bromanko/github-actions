@@ -1,0 +1,6 @@
+services:
+  dealmail:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: github-runner:latest
