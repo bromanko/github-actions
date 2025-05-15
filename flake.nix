@@ -46,12 +46,10 @@
         # App can be used with `nix run` to build and load into Docker daemon
         apps.load-runner = {
           type = "app";
-          program = [
-            "docker"
-            "load"
-            "<"
-            (builtins.toString runnerImage)
-          ];
+          program = toString (pkgs.writeShellScript "load-image" ''
+            set -e
+            ${pkgs.docker}/bin/docker load < ${builtins.toString runnerImage}
+          '');
         };
       }
     );
