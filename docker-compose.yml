@@ -4,3 +4,12 @@ services:
       context: .
       dockerfile: Dockerfile
     image: github-runner:latest
+    restart: always
+    environment:
+      REPO_URL: "https://github.com/bromanko/dealmail"
+      ACCESS_TOKEN: "${ACCESS_TOKEN}" # Sourced from .env file
+      RUNNER_NAME: "gray-area-dealmail-runner"
+      RUNNER_LABELS: "self-hosted,docker,mac,nix"
+      EPHEMERAL: "true"
+      # We’ll manage updates via Docker, not the runner app itself
+      DISABLE_AUTO_UPDATE: "true"
