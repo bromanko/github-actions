@@ -4,5 +4,4 @@
 - Docker and nix are already available
 
 ## Commands
-- Build: `nix build`
-- Verify flake: `nix flake show`
+- Build: `docker build .`
