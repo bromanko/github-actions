@@ -10,6 +10,7 @@ services:
       ACCESS_TOKEN: "${ACCESS_TOKEN}" # Sourced from .env file
       RUNNER_NAME: "gray-area-dealmail-runner"
       RUNNER_LABELS: "self-hosted,docker,mac,nix"
+      RUN_AS_ROOT: false
       EPHEMERAL: "true"
       # We’ll manage updates via Docker, not the runner app itself
       DISABLE_AUTO_UPDATE: "true"
