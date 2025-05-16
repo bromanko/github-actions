@@ -4,7 +4,7 @@ RUN sudo apt-get update
 RUN sudo apt install curl xz-utils -y
 
 # Install Nix
-USER runner # Must be installed non-root
+USER runner
 RUN curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install | \
     sh -s -- --no-daemon
 ENV PATH="${PATH}:/home/runner/.local/state/nix/profiles/profile/bin"
