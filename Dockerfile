@@ -1,4 +1,4 @@
-FROM myoung34/github-runner:latest
+FROM --platform=linux/amd64 myoung34/github-runner:latest
 
 USER root
 RUN apt-get update -y
