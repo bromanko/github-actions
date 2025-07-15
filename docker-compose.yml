@@ -4,6 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     image: github-runner:latest
+    mem_limit: 4g
     restart: always
     environment:
       REPO_URL: "https://github.com/bromanko/dealmail"
